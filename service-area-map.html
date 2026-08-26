@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Breeze Boys — Service Area</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  html, body { margin:0; height:100%; background:#F0EAE0; }
+  #map { position:absolute; inset:0; background:#F0EAE0; }
+  .leaflet-tile-pane { filter: saturate(.4) contrast(.95) brightness(1.04); }
+  .leaflet-container { font-family:'Barlow',system-ui,sans-serif; background:#F0EAE0; }
+  .bb-label {
+    background:#1C2B3A; color:#F0EAE0; border:0; border-radius:0;
+    font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; padding:3px 7px; box-shadow:none; white-space:nowrap;
+  }
+  .bb-label::before { display:none; }
+  .leaflet-control-attribution { font-size:9px; background:rgba(240,234,224,.9); }
+  @media (max-width:560px) {
+    .bb-label { font-size:9px; padding:2px 5px; letter-spacing:.06em; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+  // dir: label side; big: keep a permanent label (majors only — the tight coastal
+  // cluster gets hover labels so opaque boxes can't stack on each other)
+  var towns = [
+    ['Myrtle Beach', 33.6891, -78.8867, 'right', true],
+    ['Conway', 33.8360, -79.0478, 'left', true],
+    ['North Myrtle Beach', 33.8160, -78.6800, 'right', true],
+    ['Surfside Beach', 33.6060, -78.9739, 'right', false],
+    ['Garden City', 33.5871, -79.0009, 'left', false],
+    ['Murrells Inlet', 33.5513, -79.0359, 'left', true],
+    ['Little River', 33.8724, -78.6122, 'right', true],
+    ['Socastee', 33.6907, -78.9739, 'left', false],
+    ['Carolina Forest', 33.7565, -78.9236, 'left', false],
+    ['Aynor', 33.9963, -79.1978, 'left', true],
+    ['Loris', 34.0563, -78.8906, 'top', true],
+    ['Pawleys Island', 33.4293, -79.1220, 'left', true]
+  ];
+  // dragging off on touch devices so a swipe scrolls the page, not the map
+  var map = L.map('map', {
+    scrollWheelZoom: false,
+    zoomControl: true,
+    dragging: !L.Browser.mobile,
+    tap: false
+  }).setView([33.74, -78.92], 9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 18
+  }).addTo(map);
+
+  var bounds = [];
+  towns.forEach(function (t) {
+    var name = t[0], lat = t[1], lon = t[2], dir = t[3], big = t[4];
+    bounds.push([lat, lon]);
+    var off = dir === 'left' ? [-8, 0] : dir === 'top' ? [0, -8] : [8, 0];
+    L.circleMarker([lat, lon], {
+      radius: big ? 6 : 4.5,
+      color: '#1C2B3A',
+      weight: 2,
+      fillColor: big ? '#A6362C' : '#F0EAE0',
+      fillOpacity: 1
+    }).addTo(map).bindTooltip(name, {
+      permanent: big, direction: dir, offset: off, className: 'bb-label'
+    });
+  });
+  map.fitBounds(bounds, { padding: [48, 48] });
+  addEventListener('resize', function () {
+    map.invalidateSize();
+    map.fitBounds(bounds, { padding: [48, 48] });
+  });
+</script>
+</body>
+</html>
