@@ -1,37 +1,34 @@
-# thebreezeboys.com — static build
+# thebreezeboys.com — embedded build
 
-Plain HTML. No build step, no dependencies to install. Upload the whole folder.
+Every photo and both logos are embedded directly in the HTML as base64. There is
+no photos/ folder to upload, so nothing can 404 from a missed folder.
 
-## Files
+## Upload these five files to the repo root
 
-    index.html              Home
-    services.html           All four services (#interior #additions #outdoor #hurricane)
-    about.html              About / team / values
-    shop.html               Merch, via Shopify Buy Button
-    service-area-map.html   Leaflet map, embedded in index.html by <iframe>
-    photos/                 Project + team photos
-    logo-mark.png           Navy logo (light backgrounds)
-    logo-mark-cream.png     Cream logo (dark backgrounds)
+    index.html
+    services.html
+    about.html
+    shop.html
+    service-area-map.html
 
-## Deploying
+Optional: favicon.png (any square PNG) for the browser tab icon.
 
-**GitHub Pages** — push to a repo, then Settings → Pages → deploy from branch, root.
-Works as-is; no Jekyll config needed.
+Vercel needs no configuration — it serves the root as a static site. Confirm
+Vercel's "Root Directory" setting is blank/root and index.html sits beside it.
 
-**Any host** — drop the folder in the web root.
+## Trade-off
 
-## Third-party pieces
+These files are large (the photos live inside them), so browsers re-download the
+images on every page instead of caching them once. Fine at this scale, and it
+removes the folder-upload problem entirely.
 
-- Booking: Jotform form 232505326485153 (every "Book an estimate" button).
-- Shop: Shopify Buy Button SDK, store `n1e7zq-nq.myshopify.com`. The storefront
-  access token in shop.html is public by design — it is read-only.
-- Map: Leaflet 1.9.4 + OpenStreetMap tiles, both loaded from unpkg with SRI hashes.
-  The OSM attribution in the corner is a license requirement; leave it.
+If you'd rather have proper caching later, use the other build (separate photos/
+folder) and upload it with git rather than the GitHub web uploader:
+
+    git add . && git commit -m "site" && git push
 
 ## Before you go live
 
-- Add the SC contractor license number (footers currently say "Licensed & insured"
-  with no number).
-- Confirm the St. Jude 5% figure and the referral program terms on about.html.
-- Set up a Google Business Profile and keep the name, phone and address identical
-  to what's in the JSON-LD block at the bottom of index.html.
+- Add the SC contractor license number (footers say "Licensed & insured", no number).
+- Confirm the St. Jude 5% figure and referral terms on about.html.
+- Shopify token in shop.html is public by design — read-only, safe to commit.
