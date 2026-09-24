@@ -49,20 +49,6 @@ module.exports = async (req, res) => {
       body: JSON.stringify({ eventName: 'estimate requested', origin: 'api', contact: { email, phone: phone || undefined, firstName: d.first_name, lastName: d.last_name || '' }, properties: props })
     }).then(e => { if (!e.ok) console.error('Omnisend event', e.status); }).catch(e => console.error(e));
 
-    // Forward to the Lovable build app (Supabase edge function). Non-fatal; skipped if not configured.
-    if (process.env.LOVABLE_WEBHOOK_URL) {
-      await fetch(process.env.LOVABLE_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-webhook-secret': process.env.LOVABLE_WEBHOOK_SECRET || '' },
-        body: JSON.stringify({
-          first_name: d.first_name, last_name: d.last_name || '', email, phone: phone || d.phone,
-          address: d.address || '', town: d.town || '', services, timeline: d.timeline || '',
-          description: props.description, lead_source: d.source || '', sms_consent: smsOk,
-          status: 'requested', requested_at: now
-        })
-      }).then(e => { if (!e.ok) console.error('Lovable webhook', e.status); }).catch(e => console.error(e));
-    }
-
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error(e);
